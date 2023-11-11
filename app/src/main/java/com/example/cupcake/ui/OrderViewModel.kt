@@ -16,7 +16,6 @@
 package com.example.cupcake.ui
 
 import androidx.lifecycle.ViewModel
-import com.example.cupcake.data.OrderUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

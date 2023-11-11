@@ -15,6 +15,9 @@
  */
 package com.example.cupcake
 
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -28,11 +31,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.cupcake.ui.OrderViewModel
+import com.example.cupcake.ui.navigation.CupcakeNavHost
+import com.example.cupcake.ui.navigation.CupcakeRoutes
 
 /**
  * Composable that displays the topBar and displays back button if back navigation is possible.
@@ -40,11 +47,12 @@ import com.example.cupcake.ui.OrderViewModel
 @Composable
 fun CupcakeAppBar(
     canNavigateBack: Boolean,
+    currentScreen: CupcakeRoutes,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text(stringResource(id = R.string.app_name)) },
+        title = { Text(stringResource(id = currentScreen.title)) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -64,19 +72,54 @@ fun CupcakeAppBar(
 
 @Composable
 fun CupcakeApp(
+    modifier: Modifier = Modifier,
     viewModel: OrderViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-
+    val context = LocalContext.current
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = CupcakeRoutes.valueOf(
+        backStackEntry?.destination?.route ?: CupcakeRoutes.Start.name
+    )
     Scaffold(
         topBar = {
             CupcakeAppBar(
-                canNavigateBack = false,
-                navigateUp = { /* TODO: implement back navigation */ }
+                canNavigateBack = navController.previousBackStackEntry != null,
+                currentScreen = currentScreen,
+                navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
-
+        CupcakeNavHost(
+            navController = navController,
+            modifier = modifier.padding(innerPadding),
+            uiState = uiState,
+            onSetFlavor = { viewModel.setFlavor(it) },
+            onSetDate = { viewModel.setDate(it) },
+            onSetQuantity = { viewModel.setQuantity((it)) },
+            onCancel = {
+                viewModel.resetOrder()
+                navController.popBackStack(CupcakeRoutes.Start.name, inclusive = false)
+            },
+            onShareOrder = { subject, summary ->
+                shareOrder(context = context, subject = subject, summary = summary)
+            }
+        )
     }
 }
+
+private fun shareOrder(context: Context, subject: String, summary: String) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, summary)
+    }
+    context.startActivity(
+        Intent.createChooser(
+            intent,
+            context.getString(R.string.new_cupcake_order)
+        )
+    )
+}
+
