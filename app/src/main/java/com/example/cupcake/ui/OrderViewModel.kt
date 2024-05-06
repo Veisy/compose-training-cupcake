@@ -15,6 +15,7 @@
  */
 package com.example.cupcake.ui
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -103,7 +104,8 @@ class OrderViewModel : ViewModel() {
     /**
      * Returns a list of date options starting with the current date and the following 3 dates.
      */
-    private fun pickupOptions(): List<String> {
+    @VisibleForTesting
+    internal fun pickupOptions(): List<String> {
         val dateOptions = mutableListOf<String>()
         val formatter = SimpleDateFormat("E MMM d", Locale.getDefault())
         val calendar = Calendar.getInstance()

@@ -47,10 +47,10 @@ fun SelectOptionScreen(
     subtotal: String,
     options: List<String>,
     selectedValue: String,
-    onSelectionChanged: (String) -> Unit,
-    onCancelButtonClicked: () -> Unit,
-    onNextButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSelectionChanged: (String) -> Unit = {},
+    onCancelButtonClicked: () -> Unit = {},
+    onNextButtonClicked: () -> Unit = {}
 ){
     Column(
         modifier = modifier,
@@ -122,8 +122,5 @@ fun SelectOptionPreview(){
         options = listOf("Option 1", "Option 2", "Option 3", "Option 4"),
         modifier = Modifier.fillMaxHeight(),
         selectedValue = "Option 3",
-        onSelectionChanged = {},
-        onCancelButtonClicked = {},
-        onNextButtonClicked = {}
     )
 }

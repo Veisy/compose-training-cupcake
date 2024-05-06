@@ -57,7 +57,7 @@ fun OrderSummaryScreen(
         orderUiState.quantity,
         orderUiState.quantity
     )
-    //Load and format a string resource with the parameters.
+    // Load and format a string resource with the parameters.
     val orderSummary = stringResource(
         R.string.order_details,
         numberOfCupcakes,
